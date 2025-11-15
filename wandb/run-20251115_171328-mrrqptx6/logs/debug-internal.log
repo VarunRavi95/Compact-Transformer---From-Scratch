@@ -1,0 +1,12 @@
+{"time":"2025-11-15T17:13:31.3195158+05:30","level":"INFO","msg":"stream: starting","core version":"0.23.0"}
+{"time":"2025-11-15T17:13:32.1669851+05:30","level":"INFO","msg":"stream: created new stream","id":"mrrqptx6"}
+{"time":"2025-11-15T17:13:32.1669851+05:30","level":"INFO","msg":"handler: started","stream_id":"mrrqptx6"}
+{"time":"2025-11-15T17:13:32.1778316+05:30","level":"INFO","msg":"stream: started","id":"mrrqptx6"}
+{"time":"2025-11-15T17:13:32.1790804+05:30","level":"INFO","msg":"writer: started","stream_id":"mrrqptx6"}
+{"time":"2025-11-15T17:13:32.1797111+05:30","level":"INFO","msg":"sender: started","stream_id":"mrrqptx6"}
+{"time":"2025-11-15T17:22:57.5967909+05:30","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/files/varsi-rapyder/Translation/mrrqptx6/file_stream\": unexpected EOF"}
+{"time":"2025-11-15T17:25:14.3817466+05:30","level":"INFO","msg":"stream: closing","id":"mrrqptx6"}
+{"time":"2025-11-15T17:25:16.0098471+05:30","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-11-15T17:25:17.0926034+05:30","level":"INFO","msg":"handler: closed","stream_id":"mrrqptx6"}
+{"time":"2025-11-15T17:25:17.0945723+05:30","level":"INFO","msg":"sender: closed","stream_id":"mrrqptx6"}
+{"time":"2025-11-15T17:25:17.0945723+05:30","level":"INFO","msg":"stream: closed","id":"mrrqptx6"}

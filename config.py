@@ -74,7 +74,7 @@ class ModelArgs:
     dropout: float = 0.1
     attn_dropout: float = 0.1
 
-    device: str = 'cuda'
+    device: str = 'cpu'
     use_liger: bool = True
 
     # Training Schedule

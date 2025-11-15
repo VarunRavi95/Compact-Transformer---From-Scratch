@@ -1,0 +1,58 @@
+loading datasets...
+README.md: 11.4kB [00:00, 3.20MB/s]
+C:\Users\SRVarun\miniconda3\Lib\site-packages\huggingface_hub\file_download.py:143: UserWarning: `huggingface_hub` cache-system uses symlinks by default to efficiently store duplicated files but your machine does not support them in C:\Users\SRVarun\.cache\huggingface\hub\datasets--ai4bharat--samanantar. Caching files will still work but in a degraded version that might require more space on your disk. This warning can be disabled by setting the `HF_HUB_DISABLE_SYMLINKS_WARNING` environment variable. For more details, see https://huggingface.co/docs/huggingface_hub/how-to-cache#limitations.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+  warnings.warn(message)
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00000-of-00008.parquet: 100%|█████████████████| 240M/240M [00:40<00:00, 5.92MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00001-of-00008.parquet: 100%|█████████████████| 240M/240M [01:05<00:00, 3.64MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00002-of-00008.parquet: 100%|█████████████████| 240M/240M [01:06<00:00, 3.60MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00003-of-00008.parquet: 100%|█████████████████| 240M/240M [00:58<00:00, 4.13MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00004-of-00008.parquet: 100%|█████████████████| 240M/240M [00:26<00:00, 9.13MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00005-of-00008.parquet: 100%|█████████████████| 239M/239M [00:30<00:00, 7.83MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00006-of-00008.parquet: 100%|█████████████████| 239M/239M [01:27<00:00, 2.73MB/s]
+Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+train-00007-of-00008.parquet: 100%|██████████████████| 240M/240M [04:54<00:00, 814kB/s]
+Generating train split: 100%|██| 10125706/10125706 [00:08<00:00, 1264558.94 examples/s]
+Train dataset loaded
+Traceback (most recent call last):
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 474, in <module>
+    train()
+    ~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 300, in train
+    model = Transformer(
+        src_vocab_size=model_args.src_vocab_size,
+        tgt_vocab_size= model_args.tgt_vocab_size,
+        use_liger = model_args.use_liger
+    )
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 480, in __init__
+    self.encoder = EncoderModel(src_vocab_size=src_vocab_size)
+                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 439, in __init__
+    self.src_text_embeds = SrcTextEmbeddings(
+                           ~~~~~~~~~~~~~~~~~^
+        vocab_size=src_vocab_size,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        embeddings_dims=embeddings_dims
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 103, in __init__
+    self.embeddings_table = nn.Embedding(num_embeddings=vocab_size,
+                            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                         embedding_dim=embeddings_dims,
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                         device=device)
+                                         ^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\sparse.py", line 169, in __init__
+    torch.empty((num_embeddings, embedding_dim), **factory_kwargs),
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\cuda\__init__.py", line 403, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled

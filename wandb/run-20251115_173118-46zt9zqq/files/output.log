@@ -1,0 +1,25 @@
+loading datasets...
+Train dataset loaded
+Traceback (most recent call last):
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 475, in <module>
+    train()
+    ~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 300, in train
+    model = Transformer(
+        src_vocab_size=model_args.src_vocab_size,
+        tgt_vocab_size= model_args.tgt_vocab_size,
+        use_liger = model_args.use_liger
+    )
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 481, in __init__
+    self.decoder = DecoderModel(tgt_vocab_size=tgt_vocab_size)
+                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 366, in __init__
+    self.decoder_layers = nn.ModuleList([TransformerDecoderBlock(attn_dropout=attn_dropout, embeddings_dims=embeddings_dims, no_of_heads=no_of_heads, dropout=dropout) for _ in range(no_of_decoder_layers)])
+                                         ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 338, in __init__
+    self.cross = CrossMHA(attn_dropout=attn_dropout, embeddings_dims=embeddings_dims, no_of_heads=no_of_heads)
+                 ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 317, in __init__
+    self.heads = nn.ModuleList([CrossAttentionHead(attn_dropout=attn_dropout, embeddings_dims=embeddings_dims, no_of_heads=no_of_heads) for _ in range(no_of_heads)])
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: CrossAttentionHead.__init__() got an unexpected keyword argument 'embeddings_dims'. Did you mean 'embeddings_dim'?

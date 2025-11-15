@@ -1,0 +1,58 @@
+loading datasets...
+Train dataset loaded
+Liger kernel not available, using standard cross entropy
+Model on device cpu is ready
+Device is:  cpu
+Device is:  cpu
+Loaders ready both
+C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py:331: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = GradScaler(enabled=torch.cuda.is_available())
+Training info: 1 epochs, 313264 batches per epoch, 313264 total batches
+  0%|                                                  | 0/10000 [30:48<?, ?it/s]
+Starting with val evaluation...
+Traceback (most recent call last):
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 476, in <module>
+    train()
+    ~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 344, in train
+    losses = estimate_loss(val_loader, val_data_iterator, model_args.device, model, model_args)
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\utils\_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 262, in estimate_loss
+    loss = model(idx, targets_idx, targets, src_mask, tgt_mask)
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 511, in forward
+    x = self.decoder(x, x, tgt_idx, src_mask, tgt_mask)
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 391, in forward
+    x = decoder_layer(key, value, x, srcmask,target_mask)
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 347, in forward
+    x = self.layer_norm1(x + self.masked(x, Targetmask))
+                             ~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 206, in forward
+    concat = torch.cat([head(x, mask) for head in self.heads], dim = -1)
+                        ~~~~^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\torch\nn\modules\module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+KeyboardInterrupt

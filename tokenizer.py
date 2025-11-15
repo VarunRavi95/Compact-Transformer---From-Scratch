@@ -11,6 +11,7 @@ class Tokenizer:
         """Prepare and return the tokenizer"""
         if self.tokenizer is None:
             self.tokenizer = AlbertTokenizer.from_pretrained('ai4bharat/IndicBARTSS')
+        return self.tokenizer
 
     
 def initialize_tokenizer(hf_token = None):

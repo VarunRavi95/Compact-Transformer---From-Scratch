@@ -1,0 +1,27 @@
+loading datasets...
+Train dataset loaded
+Traceback (most recent call last):
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 475, in <module>
+    train()
+    ~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 300, in train
+    model = Transformer(
+        src_vocab_size=model_args.src_vocab_size,
+        tgt_vocab_size= model_args.tgt_vocab_size,
+        use_liger = model_args.use_liger
+    )
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 480, in __init__
+    self.encoder = EncoderModel(src_vocab_size=src_vocab_size)
+                   ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\model.py", line 433, in __init__
+    self.positional_embeddings_src = SinusoidalPositionalEmbeddings(
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        embeddings_dims=embeddings_dims,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        max_seq_len=block_size,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        theta=10000.0
+        ^^^^^^^^^^^^^
+    )
+    ^
+TypeError: SinusoidalPositionalEmbeddings.__init__() got an unexpected keyword argument 'embeddings_dims'. Did you mean 'embedding_dims'?

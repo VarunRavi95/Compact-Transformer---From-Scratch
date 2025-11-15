@@ -1,0 +1,28 @@
+{
+  "os": "Windows-11-10.0.26100-SP0",
+  "python": "CPython 3.13.5",
+  "startedAt": "2025-11-15T13:10:00.720965Z",
+  "program": "C:\\Users\\SRVarun\\OneDrive - Rapyder Cloud Solutions Pvt Ltd\\Desktop\\Compact Transformer - From Scratch\\trainer.py",
+  "codePath": "trainer.py",
+  "codePathLocal": "trainer.py",
+  "git": {
+    "remote": "https://github.com/VarunRavi95/Compact-Transformer---From-Scratch.git",
+    "commit": "04d5a47623bbbbef15c9b0511ff3da49f8000912"
+  },
+  "email": "varsi146@student.liu.se",
+  "root": "C:\\Users\\SRVarun\\OneDrive - Rapyder Cloud Solutions Pvt Ltd\\Desktop\\Compact Transformer - From Scratch",
+  "host": "RCSLP01054",
+  "executable": "C:\\Users\\SRVarun\\miniconda3\\python.exe",
+  "cpu_count": 12,
+  "cpu_count_logical": 14,
+  "disk": {
+    "/": {
+      "total": "511312916480",
+      "used": "168576335872"
+    }
+  },
+  "memory": {
+    "total": "16669306880"
+  },
+  "writerId": "h8nrwtowpo4iqrwr1v6jo3003jicdi3z"
+}

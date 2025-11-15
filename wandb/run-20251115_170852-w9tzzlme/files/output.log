@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 474, in <module>
+    train()
+    ~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py", line 286, in train
+    tokenizer = initialize_tokenizer(model_args.hf_token)
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\tokenizer.py", line 19, in initialize_tokenizer
+    return tokenizer_instance.ready_tokenizer()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\tokenizer.py", line 13, in ready_tokenizer
+    self.tokenizer = AlbertTokenizer.from_pretrained('ai4bharat/IndicBARTSS')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\transformers\utils\import_utils.py", line 2157, in __getattribute__
+    requires_backends(cls, cls._backends)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\SRVarun\miniconda3\Lib\site-packages\transformers\utils\import_utils.py", line 2143, in requires_backends
+    raise ImportError("".join(failed))
+ImportError:
+AlbertTokenizer requires the SentencePiece library but it was not found in your environment. Check out the instructions on the
+installation page of its repo: https://github.com/google/sentencepiece#installation and follow the ones
+that match your environment. Please note that you may need to restart your runtime after installation.

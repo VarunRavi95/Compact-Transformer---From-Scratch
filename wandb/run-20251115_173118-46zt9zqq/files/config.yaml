@@ -1,0 +1,47 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            68vtbpofemai8fgt1o533cfzmrzd2cxv:
+                codePath: trainer.py
+                codePathLocal: trainer.py
+                cpu_count: 12
+                cpu_count_logical: 14
+                disk:
+                    /:
+                        total: "511312916480"
+                        used: "168307482624"
+                email: varsi146@student.liu.se
+                executable: C:\Users\SRVarun\miniconda3\python.exe
+                git:
+                    commit: 04d5a47623bbbbef15c9b0511ff3da49f8000912
+                    remote: https://github.com/VarunRavi95/Compact-Transformer---From-Scratch.git
+                host: RCSLP01054
+                memory:
+                    total: "16669306880"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch\trainer.py
+                python: CPython 3.13.5
+                root: C:\Users\SRVarun\OneDrive - Rapyder Cloud Solutions Pvt Ltd\Desktop\Compact Transformer - From Scratch
+                startedAt: "2025-11-15T12:01:18.871173Z"
+                writerId: 68vtbpofemai8fgt1o533cfzmrzd2cxv
+        m: []
+        python_version: 3.13.5
+        t:
+            "1":
+                - 1
+                - 11
+                - 49
+                - 51
+            "2":
+                - 1
+                - 11
+                - 49
+                - 51
+            "4": 3.13.5
+            "5": 0.23.0
+            "6": 4.57.1
+            "8":
+                - 3
+            "12": 0.23.0
+            "13": windows-amd64
