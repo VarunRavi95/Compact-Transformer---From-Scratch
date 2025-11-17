@@ -1,3 +1,5 @@
+import os
+from contextlib import nullcontext
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -13,7 +15,99 @@ from model import Transformer, initialize_tokenizer_in_model
 from data import prepare_dataset, load_datasets
 from tokenizer import initialize_tokenizer
 
-def _save_snapshot(model, optimizer, scheduler, epoch, step):
+
+def _env_flag(var_name: str, default: bool = False) -> bool:
+    """Interpret environment variable values such as '1/true/yes' as booleans."""
+    raw_value = os.environ.get(var_name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _prepare_directory(path: str) -> str:
+    """Ensure the directory exists and return its absolute path."""
+    os.makedirs(path, exist_ok=True)
+    return os.path.abspath(path)
+
+
+DEFAULT_CHECKPOINT_DIR = _prepare_directory(
+    os.environ.get("SM_MODEL_DIR", os.path.join(os.getcwd(), "checkpoints"))
+)
+DEFAULT_GENERATED_DIR = _prepare_directory(
+    os.environ.get(
+        "SM_OUTPUT_DATA_DIR",
+        os.environ.get("GENERATED_DATA_DIR", os.path.join(os.getcwd(), "generated_data")),
+    )
+)
+WANDB_PROJECT = os.environ.get("WANDB_PROJECT", "Translation")
+WANDB_ENTITY = os.environ.get("WANDB_ENTITY")
+WANDB_MODE = os.environ.get("WANDB_MODE")
+WANDB_RUN_NAME = os.environ.get("WANDB_RUN_NAME")
+WANDB_ENABLED = not _env_flag("WANDB_DISABLED", False)
+ENABLE_TORCH_COMPILE = _env_flag("ENABLE_TORCH_COMPILE", True)
+WANDB_AVAILABLE = False
+
+
+def _use_cuda(device_name: str) -> bool:
+    """Return True when CUDA is requested and available."""
+    return "cuda" in str(device_name).lower() and torch.cuda.is_available()
+
+
+def get_autocast_context(device_name: str):
+    """Return the appropriate autocast context manager for the current device."""
+    if _use_cuda(device_name):
+        return torch.autocast(device_type="cuda", dtype=torch.float16)
+    return nullcontext()
+
+
+def initialize_wandb():
+    """Best-effort initialization of Weights & Biases."""
+    global WANDB_AVAILABLE
+
+    if not WANDB_ENABLED:
+        print("W&B logging disabled via WANDB_DISABLED.")
+        WANDB_AVAILABLE = False
+        return
+
+    init_kwargs = {"project": WANDB_PROJECT}
+    if WANDB_ENTITY:
+        init_kwargs["entity"] = WANDB_ENTITY
+    if WANDB_MODE:
+        init_kwargs["mode"] = WANDB_MODE
+    if WANDB_RUN_NAME:
+        init_kwargs["name"] = WANDB_RUN_NAME
+
+    try:
+        wandb.init(**init_kwargs)
+        WANDB_AVAILABLE = True
+    except Exception as exc:
+        WANDB_AVAILABLE = False
+        print(
+            "Warning: Failed to initialize Weights & Biases logging "
+            f"({exc}). Training will continue without experiment tracking."
+        )
+
+
+def wandb_log(metrics: dict):
+    """Log metrics to W&B if the run is active."""
+    if WANDB_AVAILABLE:
+        try:
+            wandb.log(metrics)
+        except Exception as exc:
+            print(f"Warning: Failed to push metrics to W&B ({exc}). Disabling logging.")
+            wandb.finish()
+            globals()["WANDB_AVAILABLE"] = False
+
+
+def finalize_wandb():
+    """Close the W&B run if it was started."""
+    if WANDB_AVAILABLE:
+        try:
+            wandb.finish()
+        except Exception as exc:
+            print(f"Warning: Failed to close W&B cleanly ({exc}).")
+
+def _save_snapshot(model, optimizer, scheduler, epoch, step, checkpoint_dir: str = DEFAULT_CHECKPOINT_DIR):
     """Save model checkpoint"""
     snapshot = {
         "MODEL_STATE": model.state_dict(),
@@ -21,8 +115,10 @@ def _save_snapshot(model, optimizer, scheduler, epoch, step):
         "EPOCHS_RUN": epoch,
         "STEP_RUN": step
     }
-    torch.save(snapshot, f"checkpoints/snapshot_{step}.pt")
-    print(f"Epoch: {epoch} | Step: {step} | Snapshot saved.")
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    ckpt_path = os.path.join(checkpoint_dir, f"snapshot_{step}.pt")
+    torch.save(snapshot, ckpt_path)
+    print(f"Epoch: {epoch} | Step: {step} | Snapshot saved to {ckpt_path}.")
 
 def get_lr(it, model_args):
     """Learning Rate Scheduler with warmup and cosine decay"""
@@ -226,21 +322,23 @@ def beam_search_corrected(
     return generated_text
 
 @torch.inference_mode()
-def estimate_loss(val_loader, val_iterator, device, model, model_args):
+def estimate_loss(val_loader, device, model, model_args):
     """Estimate validation loss"""
     out = {}
     model.eval()
+    tokenizer = initialize_tokenizer(model_args.hf_token)
     
     for split in ['val']:
         print(f"Starting with {split} evaluation...")
         epoch_losses = []
+        val_iterator = iter(val_loader)
         
         for step in range(model_args.eval_check):  
             try:
                 batch = next(val_iterator)
             except StopIteration:
-                val_loader_iterator = iter(val_loader)
-                batch = next(val_loader_iterator)
+                val_iterator = iter(val_loader)
+                batch = next(val_iterator)
             
             total_loss = 0  
             total_batches = 0 
@@ -252,13 +350,10 @@ def estimate_loss(val_loader, val_iterator, device, model, model_args):
             src_mask = torch.ones(model_args.batch_size, model_args.block_size, dtype=idx.dtype).to(device)
             tgt_mask = torch.ones(model_args.batch_size, model_args.block_size, dtype=idx.dtype).to(device)
             
-            # Get tokenizer for pad token
-            tokenizer = initialize_tokenizer(model_args.hf_token)
-            
             src_mask = src_mask.masked_fill(idx == tokenizer.pad_token_id, 0)
             tgt_mask = tgt_mask.masked_fill(targets_idx == tokenizer.pad_token_id, 0)
             
-            with torch.autocast(device_type='cuda' if 'cuda' in str(device) else 'cpu', dtype=torch.float16):
+            with get_autocast_context(device):
                 loss = model(idx, targets_idx, targets, src_mask, tgt_mask)
             
             total_loss += loss.item()
@@ -277,11 +372,17 @@ def estimate_loss(val_loader, val_iterator, device, model, model_args):
 def train():
     """Main Training Function"""
 
-    wandb.init(
-        project='Translation'
-    )
+    parsed_args = get_args()
+    model_args = ModelArgs(**vars(parsed_args))
+    env_hf_token = os.environ.get("HF_TOKEN")
+    if not model_args.hf_token and env_hf_token:
+        model_args.hf_token = env_hf_token
 
-    model_args = ModelArgs()
+    if model_args.device.startswith('cuda') and not torch.cuda.is_available():
+        print("CUDA requested but not available. Falling back to CPU.")
+        model_args.device = 'cpu'
+
+    initialize_wandb()
 
     tokenizer = initialize_tokenizer(model_args.hf_token)
 
@@ -307,14 +408,19 @@ def train():
 
     optimizer = optim.AdamW(
         model.parameters(),
-        lr = model_args.max_lr,
+        lr=model_args.max_lr,
         betas=(model_args.beta_1, model_args.beta_2),
         weight_decay=model_args.weight_decay_optim,
-        eps = model_args.eps
+        eps=model_args.eps
     )
 
-    if torch.cuda.is_available():
+    if ENABLE_TORCH_COMPILE and _use_cuda(model_args.device):
         model = torch.compile(model)
+    else:
+        if ENABLE_TORCH_COMPILE and not _use_cuda(model_args.device):
+            print("Torch compile requested but unavailable on the current device; running eagerly.")
+        elif not ENABLE_TORCH_COMPILE:
+            print("Torch compile disabled via ENABLE_TORCH_COMPILE.")
 
     model = model.to(model_args.device)
 
@@ -324,11 +430,10 @@ def train():
     print("Loaders ready both")
 
     train_data_iterator = iter(train_dataloader)
-    val_data_iterator = iter(val_loader)
     token_count = 0
     
     # Setup mixed precision training
-    scaler = GradScaler(enabled=torch.cuda.is_available())
+    scaler = GradScaler(enabled=_use_cuda(model_args.device))
     
     # Calculate total batches
     batches_per_epoch = len(train_dataloader)
@@ -341,14 +446,14 @@ def train():
     for step in tqdm(range(model_args.total_iters)):
 
         if (step % model_args.eval_iters == 0) or step == model_args.total_iters - 1:
-            losses = estimate_loss(val_loader, val_data_iterator, model_args.device, model, model_args)
+            losses = estimate_loss(val_loader, model_args.device, model, model_args)
             avg_val_loss = losses['val']
 
-            print(f"[GPU {model_args.device}] | Step: {step} / {model_args.total_iters} | Val Loss: {losses['val']:.4f}")
+            print(f"[Device {model_args.device}] | Step: {step} / {model_args.total_iters} | Val Loss: {losses['val']:.4f}")
             
             perplexity = torch.exp(torch.tensor(avg_val_loss))
 
-            wandb.log({
+            wandb_log({
                 "Val_Loss": avg_val_loss,
                 "Val Perplexity": perplexity.item(),
                 "Total Tokens Processed": token_count,
@@ -358,7 +463,7 @@ def train():
 
         if step % model_args.save_checkpoint_iter == 0:
             print(f"Saving the model checkpoint for step: {step}")
-            _save_snapshot(model, optimizer, None, None, step)
+            _save_snapshot(model, optimizer, None, None, step, checkpoint_dir=DEFAULT_CHECKPOINT_DIR)
         
         # Initialize gradient accumulation
         accumulated_loss = 0.0
@@ -368,7 +473,7 @@ def train():
             try:
                 micro_batch = next(train_data_iterator)
             except StopIteration:
-                train_data_iterator = iter(train_data_iterator)
+                train_data_iterator = iter(train_dataloader)
                 micro_batch = next(train_data_iterator)
             
             idx = micro_batch['input_ids'].to(model_args.device)
@@ -383,7 +488,7 @@ def train():
             
             token_count += idx.numel()
 
-            with torch.autocast(device_type='cuda' if 'cuda' in str(model_args.device) else 'cpu', dtype=torch.float16):
+            with get_autocast_context(model_args.device):
                 loss = model(idx, targets_idx, targets, src_mask, tgt_mask)
 
             # Scale loss by gradient accumulation steps
@@ -427,7 +532,7 @@ def train():
         scaler.step(optimizer)
         scaler.update()
 
-        if torch.cuda.is_available():
+        if _use_cuda(model_args.device):
             torch.cuda.empty_cache()
     
         # Calculate metrics
@@ -437,14 +542,14 @@ def train():
         print("Total gradient accumulation steps: ", model_args.gradient_accumulation_steps)
         print("Total tokens processed: ", token_count)
 
-        grad_norm_value = total_norm_before.item() if torch.is_tensor(total_norm_before) else total_norm_before
-        wandb.log({
+        grad_norm_value = total_norm_before.item() if torch.is_tensor(total_norm_before) else float(total_norm_before)
+        wandb_log({
                 "Learning Rate": lr,
                 "Train_Loss": accumulated_loss,
                 "Train Perplexity": perplexity.item(),
                 "Total Tokens Processed": token_count,
                 "Step": step,
-                "Gradient Norm": float(grad_norm_value),
+                "Gradient Norm": grad_norm_value,
                 "Gradient Accumulation Steps": model_args.gradient_accumulation_steps,
             })
         
@@ -461,7 +566,9 @@ def train():
                     print(f"\nTop-K Generated Text: {generated_text}")
                     print(f"Beam Search Text: {beam_text}\n")
                     
-                    with open(f'generated_data/generations_{step}.txt', 'a') as f:
+                    os.makedirs(DEFAULT_GENERATED_DIR, exist_ok=True)
+                    generations_path = os.path.join(DEFAULT_GENERATED_DIR, f'generations_{step}.txt')
+                    with open(generations_path, 'a', encoding='utf-8') as f:
                         f.write(f"------------------------------------------------Step: {step}--------------------------------------------\n\n")
                         f.write(f"Prompt: {prt}\n\n")
                         f.write(f"Top-K Generated Text: {generated_text}\n\n")
@@ -469,8 +576,8 @@ def train():
                 
                 count -= 1
             
-    _save_snapshot(model, optimizer, None, None, step)
-    wandb.finish()
+    _save_snapshot(model, optimizer, None, None, step, checkpoint_dir=DEFAULT_CHECKPOINT_DIR)
+    finalize_wandb()
 
 if __name__ == "__main__":
     train()

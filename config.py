@@ -81,6 +81,7 @@ class ModelArgs:
     warmup_iters: int = 400
     lr_decay_iters: int = 10000
     min_lr_ratio: float = 0.1
+    min_lr: float = None
     total_iters: int = 10000
     eval_iters: int = 200
     eval_check: int = 200
@@ -98,4 +99,5 @@ class ModelArgs:
         if self.gradient_accumulation_steps is None:
             self.gradient_accumulation_steps = self.total_batch_size // (self.batch_size * 1 * self.block_size)
 
-        self.min_lr_ratio = self.min_lr_ratio * self.max_lr
+        if self.min_lr is None:
+            self.min_lr = self.min_lr_ratio * self.max_lr
