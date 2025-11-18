@@ -314,13 +314,20 @@ class CrossMHA(nn.Module):
     ):
         super().__init__()
         # Multi-head wrapper for encoder-decoder cross attention.
-        self.heads = nn.ModuleList([CrossAttentionHead(attn_dropout=attn_dropout, embedding_dims=embedding_dims, no_of_heads=no_of_heads) for _ in range(no_of_heads)])
+        self.heads = nn.ModuleList([
+            CrossAttentionHead(
+                attn_dropout=attn_dropout,
+                embedding_dims=embedding_dims,
+                no_of_heads=no_of_heads
+            )
+            for _ in range(no_of_heads)
+        ])
         self.dropout = nn.Dropout(p=attn_dropout)
         self.linear = nn.Linear(in_features=embedding_dims, out_features=embedding_dims, device=device, bias=False)
 
-    def forward(self, value, key, x, srcmask=None):
-        # value/key originate from encoder; x supplies decoder queries.
-        concat = torch.cat([head(value, key, x, srcmask) for head in self.heads], dim=-1)
+    def forward(self, key, value, x, srcmask=None):
+        # x supplies decoder queries; key/value come from encoder outputs.
+        concat = torch.cat([head(x, key, value, srcmask) for head in self.heads], dim=-1)
         linear_layer = self.linear(concat)
         out = self.dropout(linear_layer)
         return out
